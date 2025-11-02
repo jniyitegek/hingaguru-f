@@ -4,6 +4,8 @@
 /node_modules
 */node_modules
 /*/node_modules
+node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -17,6 +19,9 @@
 
 # next.js
 /.next/
+/*.next/
+.next/
+
 /out/
 
 # production
