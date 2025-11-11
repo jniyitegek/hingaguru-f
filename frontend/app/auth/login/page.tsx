@@ -33,6 +33,7 @@ const LoginPage = () => {
                         <Typography color={`primary_700`} weight={`medium`}>
                             Forgot Password?
                         </Typography>
+                        
                     </Link>
                 </div>
                 

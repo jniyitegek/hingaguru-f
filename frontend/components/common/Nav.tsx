@@ -1,27 +1,29 @@
 "use client"
-import { useState } from "react";
 import { Users, Grid3x3, Sprout, DollarSign, Briefcase, Wrench, LogOut } from 'lucide-react';
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 
 interface NavItem {
     id: string;
     label: string;
     icon: React.ElementType;
+    href: string;
 }
 
 
 const Nav = () => {
 
-        const [activeNav, setActiveNav] = useState<string>('dashboard');
+        const pathname = usePathname();
     
         const navItems: NavItem[] = [
-            { id: 'dashboard', label: 'Dashboard', icon: Grid3x3 },
-            { id: 'employees', label: 'Employees', icon: Users },
-            { id: 'farmlands', label: 'Farmlands', icon: Sprout },
-            { id: 'crops', label: 'Crops', icon: Sprout },
-            { id: 'finances', label: 'Finances', icon: DollarSign },
-            { id: 'aitools', label: 'AI Tools', icon: Wrench },
+            { id: 'dashboard', label: 'Dashboard', icon: Grid3x3, href: "/dashboard" },
+            { id: 'employees', label: 'Employees', icon: Users, href: "/dashboard/employees" },
+            { id: 'farmlands', label: 'Farmlands', icon: Sprout, href: "/dashboard/farmlands" },
+            { id: 'crops', label: 'Crops', icon: Sprout, href: "/dashboard/crops" },
+            { id: 'finances', label: 'Finances', icon: DollarSign, href: "/dashboard/finances" },
+            { id: 'aitools', label: 'AI Tools', icon: Wrench, href: "/dashboard/ai-tools" },
         ];
     
     return ( 
@@ -36,19 +38,20 @@ const Nav = () => {
                 <nav className="flex-1 p-4">
                     {navItems.map((item) => {
                         const Icon = item.icon;
+                        const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
                         return (
-                            <button
+                            <Link
                                 key={item.id}
-                                onClick={() => setActiveNav(item.id)}
+                                href={item.href}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-colors ${
-                                    activeNav === item.id
+                                    isActive
                                         ? 'bg-green-50 text-green-700'
                                         : 'text-gray-700 hover:bg-gray-50'
                                 }`}
                             >
                                 <Icon size={20} />
                                 <span className="font-medium">{item.label}</span>
-                            </button>
+                            </Link>
                         );
                     })}
                 </nav>

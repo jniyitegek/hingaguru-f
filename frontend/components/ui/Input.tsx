@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Typography from "./Typography";
 import { SearchIcon } from "lucide-react";
 
-type InputVariant = "text" | "email" | "password" | "number" | "textarea" | "select";
+type InputVariant = "text" | "email" | "password" | "number" | "date" | "textarea" | "select";
 
 interface SelectOption {
     value: string;
@@ -55,6 +55,7 @@ export default function Input({
         email: "input",
         password: "input",
         number: "input",
+        date: "input",
         textarea: "textarea",
         select: "select",
     };
@@ -93,14 +94,30 @@ export default function Input({
                     <SearchIcon className={`text-gray-500`}/>
                 )
             }
-            {(
+            {variant === "select" ? (
+                <select
+                    id={inputId}
+                    name={name}
+                    value={value}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange?.(e.target.value)}
+                    disabled={disabled}
+                    required={required}
+                    className={mergedClasses}
+                >
+                    {options.map((opt) => (
+                        <option key={String(opt.value)} value={String(opt.value)}>
+                            {opt.label}
+                        </option>
+                    ))}
+                </select>
+            ) : (
                 <Component
                     id={inputId}
                     name={name}
                     {...(variant !== "textarea" ? { type: variant } : {})}
                     value={value}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                        onChange?.(e.target.value)
+                        onChange?.((e.target as HTMLInputElement | HTMLTextAreaElement).value)
                     }
                     placeholder={placeholder}
                     disabled={disabled}

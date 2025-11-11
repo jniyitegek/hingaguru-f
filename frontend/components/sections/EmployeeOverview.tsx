@@ -1,6 +1,10 @@
 import { ChevronRight, Users } from "lucide-react";
 
-const EmployeeOverview = () => {
+type Props = {
+    onManageTeam?: () => void;
+}
+
+const EmployeeOverview = ({ onManageTeam }: Props) => {
     return ( 
         <div className="bg-white rounded-xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
@@ -21,7 +25,7 @@ const EmployeeOverview = () => {
                     <div className="text-xs text-gray-500">On Leave</div>
                 </div>
             </div>
-            <button className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all">
+            <button onClick={onManageTeam} className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all">
                 Manage Team <ChevronRight size={16} />
             </button>
         </div>
