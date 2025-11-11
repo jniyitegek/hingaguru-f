@@ -34,7 +34,7 @@ const Tasks = () => {
                         <DollarSign className="text-blue-500" size={16} />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-800 text-sm">Pay Employee: John Doe</div>
+                        <div className="font-medium text-gray-800 text-sm">Pay Employee: L. Karekezi</div>
                         <div className="text-xs text-gray-500">Due in 3 days</div>
                     </div>
                 </div>

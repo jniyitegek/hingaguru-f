@@ -21,7 +21,6 @@ const Nav = () => {
             { id: 'farmlands', label: 'Farmlands', icon: Sprout },
             { id: 'crops', label: 'Crops', icon: Sprout },
             { id: 'finances', label: 'Finances', icon: DollarSign },
-            { id: 'partners', label: 'Partners', icon: Briefcase },
             { id: 'aitools', label: 'AI Tools', icon: Wrench },
         ];
     

@@ -58,16 +58,6 @@ const HomeFeatures = () => {
                             </p>
                         </div>
 
-                        {/* Partner Collaboration */}
-                        <div className="bg-white border border-gray-200 rounded-2xl p-8 transition-shadow">
-                            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-6">
-                                <Handshake className="text-green-600" size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Partner Collaboration</h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                Collaborate seamlessly with partners, suppliers, and buyers within the platform.
-                            </p>
-                        </div>
                     </div>
                 </div>
             </section>

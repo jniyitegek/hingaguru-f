@@ -19,6 +19,7 @@ export default function HingaguruDashboard() {
             <Nav />
 
             {/* Main Content */}
+            
             <main className="flex-1 overflow-auto">
                 {/* Header */}
                 <AuthNav />
