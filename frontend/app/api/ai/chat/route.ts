@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const useOpenAI = model === "openai";
     const openaiKey = process.env.OPENAI_API_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
+    const geminiKey = "AIzaSyBtRIaiDxzVo5K_A39dx_P_5_2ZRRgrkb0";
 
     if (useOpenAI && openaiKey) {
       const payload: any = {
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify(payload),
       });
       const data = await resp.json();
+      console.log("OpenAI raw response:", data);
       const reply = data?.choices?.[0]?.message?.content ?? "I couldn't generate a response.";
       console.log("OpenAI response:", data);
       return NextResponse.json({ reply });
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify(payload),
       });
       const data = await resp.json();
+      console.log("Gemini raw response:", data);
       const reply = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join("\n") ?? "I couldn't generate a response.";
       return NextResponse.json({ reply });
     }

@@ -4,31 +4,23 @@ import React, { useMemo, useState } from "react";
 import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-
-type Farmland = {
-  id: string;
-  name: string;
-  area?: string;
-  crops: string[];
-  nextIrrigationDate?: string; // ISO yyyy-mm-dd
-  nextFertilizingDate?: string; // ISO yyyy-mm-dd
-  plannedPlantingDate?: string; // ISO yyyy-mm-dd
-};
+import { api, type Farmland } from "@/lib/api";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onCreated?: (farmland: Farmland) => void;
 };
 
-const STORAGE_KEY = "hingaguru_farmlands";
-
-export default function FarmlandManager({ isOpen, onClose }: Props) {
+export default function FarmlandManager({ isOpen, onClose, onCreated }: Props) {
   const [name, setName] = useState("");
   const [area, setArea] = useState("");
   const [crops, setCrops] = useState("");
   const [nextIrrigationDate, setNextIrrigationDate] = useState("");
   const [nextFertilizingDate, setNextFertilizingDate] = useState("");
   const [plannedPlantingDate, setPlannedPlantingDate] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isValid = useMemo(() => {
     return name.trim().length > 1;
@@ -41,30 +33,32 @@ export default function FarmlandManager({ isOpen, onClose }: Props) {
     setNextIrrigationDate("");
     setNextFertilizingDate("");
     setPlannedPlantingDate("");
+    setError(null);
   }
 
-  function handleAdd() {
-    if (!isValid) return;
-    const newFarmland: Farmland = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      area: area.trim() || undefined,
-      crops: crops.split(",").map(c => c.trim()).filter(Boolean),
-      nextIrrigationDate: nextIrrigationDate || undefined,
-      nextFertilizingDate: nextFertilizingDate || undefined,
-      plannedPlantingDate: plannedPlantingDate || undefined,
-    };
+  async function handleAdd() {
+    if (!isValid || submitting) return;
+    setSubmitting(true);
+    setError(null);
+
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const current: Farmland[] = raw ? JSON.parse(raw) : [];
-      const next = [newFarmland, ...current];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      window.dispatchEvent(new Event("farmlands:updated"));
-    } catch {
-      // ignore
+      const created = await api.createFarmland({
+        name: name.trim(),
+        area: area.trim() || undefined,
+        crops: crops,
+        nextIrrigationDate: nextIrrigationDate || undefined,
+        nextFertilizingDate: nextFertilizingDate || undefined,
+        plannedPlantingDate: plannedPlantingDate || undefined,
+      });
+      onCreated?.(created);
+      resetForm();
+      onClose();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to create farmland";
+      setError(message);
+    } finally {
+      setSubmitting(false);
     }
-    resetForm();
-    onClose();
   }
 
   if (!isOpen) return null;
@@ -83,16 +77,39 @@ export default function FarmlandManager({ isOpen, onClose }: Props) {
           <Input id="farmland-name" label="Farmland name" value={name} onChange={setName} required placeholder="North Plot" />
           <Input id="farmland-area" label="Area (e.g., 2.5 ha)" value={area} onChange={setArea} placeholder="2 ha" />
           <Input id="farmland-crops" label="Crops (comma-separated)" value={crops} onChange={setCrops} placeholder="Maize, Beans" />
-          <Input id="farmland-next-irrigation" variant="date" label="Next irrigation date" value={nextIrrigationDate} onChange={setNextIrrigationDate} />
-          <Input id="farmland-next-fertilizing" variant="date" label="Next fertilizing date" value={nextFertilizingDate} onChange={setNextFertilizingDate} />
-          <Input id="farmland-planting-date" variant="date" label="Planned planting date" value={plannedPlantingDate} onChange={setPlannedPlantingDate} />
+          <Input
+            id="farmland-next-irrigation"
+            variant="date"
+            label="Next irrigation date"
+            value={nextIrrigationDate}
+            onChange={setNextIrrigationDate}
+          />
+          <Input
+            id="farmland-next-fertilizing"
+            variant="date"
+            label="Next fertilizing date"
+            value={nextFertilizingDate}
+            onChange={setNextFertilizingDate}
+          />
+          <Input
+            id="farmland-planting-date"
+            variant="date"
+            label="Planned planting date"
+            value={plannedPlantingDate}
+            onChange={setPlannedPlantingDate}
+          />
         </div>
-        <div className="flex justify-end">
-          <Button onClick={handleAdd} disabled={!isValid}>Add Farmland</Button>
+        {error && <div className="text-sm text-red-600 mb-4">{error}</div>}
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleAdd} disabled={!isValid || submitting}>
+            {submitting ? "Saving…" : "Add Farmland"}
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-
 

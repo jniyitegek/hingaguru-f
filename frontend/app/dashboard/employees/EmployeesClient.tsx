@@ -1,67 +1,65 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { Trash2, UserPlus } from "lucide-react";
 import Nav from "@/components/common/Nav";
 import AuthNav from "@/components/common/AuthNav";
+import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import EmployeesManager from "@/components/sections/employees/EmployeesManager.client";
-import { useEffect, useState } from "react";
-import { Trash2, UserPlus } from "lucide-react";
-import Input from "@/components/ui/Input";
-
-type Employee = {
-  id: string;
-  fullName: string;
-  role: string;
-  phone: string;
-};
-
-const STORAGE_KEY = "hingaguru_employees";
+import { api, type Employee } from "@/lib/api";
 
 export default function EmployeesClient() {
   const [isOpen, setIsOpen] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [query, setQuery] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
-  function loadEmployees() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      setEmployees(raw ? JSON.parse(raw) : []);
-    } catch {
-      setEmployees([]);
-    }
-  }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return employees;
+    return employees.filter((employee) => {
+      return (
+        employee.fullName.toLowerCase().includes(q) ||
+        employee.role.toLowerCase().includes(q) ||
+        employee.phone.toLowerCase().includes(q) ||
+        employee.status.replace("_", " ").toLowerCase().includes(q)
+      );
+    });
+  }, [employees, query]);
 
   useEffect(() => {
-    loadEmployees();
-    const handler = () => loadEmployees();
-    window.addEventListener("employees:updated", handler as EventListener);
-    return () => window.removeEventListener("employees:updated", handler as EventListener);
+    async function load() {
+      try {
+        setLoading(true);
+        setError(null);
+        const list = await api.getEmployees();
+        setEmployees(list);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unable to load employees";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
   }, []);
 
-  function saveEmployees(next: Employee[]) {
+  async function handleDelete(id: string) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      window.dispatchEvent(new Event("employees:updated"));
-    } catch {
-      // ignore
+      await api.deleteEmployee(id);
+      setEmployees((prev) => prev.filter((employee) => employee.id !== id));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete employee";
+      setError(message);
     }
   }
 
-  function handleDelete(id: string) {
-    const next = employees.filter(e => e.id !== id);
-    setEmployees(next);
-    saveEmployees(next);
+  function handleCreated(employee: Employee) {
+    setEmployees((prev) => [employee, ...prev]);
   }
-
-  const filtered = employees.filter(e => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      e.fullName.toLowerCase().includes(q) ||
-      e.role.toLowerCase().includes(q) ||
-      e.phone.toLowerCase().includes(q)
-    );
-  });
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -76,7 +74,7 @@ export default function EmployeesClient() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-72">
-                <Input id="search-employees" placeholder="Search by name, role, phone" value={query} onChange={setQuery} />
+                <Input id="search-employees" placeholder="Search by name, role, phone, status" value={query} onChange={setQuery} />
               </div>
               <Button onClick={() => setIsOpen(true)}>
                 <UserPlus className="mr-2" /> Add Employee
@@ -84,21 +82,31 @@ export default function EmployeesClient() {
             </div>
           </div>
 
+          {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="grid grid-cols-12 bg-gray-50 text-gray-600 text-sm font-medium px-6 py-3 rounded-t-xl">
-              <div className="col-span-5">Full name</div>
-              <div className="col-span-4">Role</div>
+              <div className="col-span-4">Full name</div>
+              <div className="col-span-3">Role</div>
               <div className="col-span-2">Phone</div>
+              <div className="col-span-2">Status</div>
               <div className="col-span-1 text-right">Actions</div>
             </div>
-            {filtered.length === 0 ? (
-              <div className="px-6 py-8 text-gray-500 text-sm">{employees.length === 0 ? "No employees yet." : "No employees match your search."}</div>
+            {loading ? (
+              <div className="px-6 py-8 text-gray-500 text-sm">Loading employees…</div>
+            ) : filtered.length === 0 ? (
+              <div className="px-6 py-8 text-gray-500 text-sm">
+                {employees.length === 0 ? "No employees yet." : "No employees match your search."}
+              </div>
             ) : (
-              filtered.map(emp => (
+              filtered.map((emp) => (
                 <div key={emp.id} className="grid grid-cols-12 items-center px-6 py-4 border-t">
-                  <div className="col-span-5 text-gray-800">{emp.fullName}</div>
-                  <div className="col-span-4 text-gray-700">{emp.role}</div>
+                  <div className="col-span-4 text-gray-800">{emp.fullName}</div>
+                  <div className="col-span-3 text-gray-700">{emp.role}</div>
                   <div className="col-span-2 text-gray-700">{emp.phone}</div>
+                  <div className="col-span-2 capitalize text-gray-700">
+                    {emp.status.replace("_", " ")}
+                  </div>
                   <div className="col-span-1 text-right">
                     <button
                       className="inline-flex items-center text-red-600 hover:text-red-700"
@@ -113,10 +121,9 @@ export default function EmployeesClient() {
             )}
           </div>
         </div>
-        <EmployeesManager isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        <EmployeesManager isOpen={isOpen} onClose={() => setIsOpen(false)} onCreated={handleCreated} />
       </main>
     </div>
   );
 }
-
 

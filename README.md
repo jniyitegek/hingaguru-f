@@ -39,6 +39,8 @@ npm install
 npm run dev
 ```
 
+By default the API listens on port `3000`. You can override this in `.env` (see below).
+
 ### Frontend Setup
 
 ```bash
@@ -47,10 +49,7 @@ npm install
 npm run dev
 ```
 
-The frontend will run on `http://localhost:3000`
-
-
-The backend API will run on `http://localhost:5000`
+Set the `NEXT_PUBLIC_API_BASE_URL` environment variable so the Next.js app knows how to reach the Express API (defaults to `http://localhost:3000` when unset).
 
 ## Features
 
@@ -64,6 +63,22 @@ The backend API will run on `http://localhost:5000`
 ## Environment Variables
 
 Create `.env` files in both frontend and backend directories with appropriate configurations.
+
+#### Backend (`backend/.env`)
+
+```
+MONGO_URL=mongodb://127.0.0.1:27017/hingaguru
+PORT=3000
+DUMMY_USER_EMAIL=demo@hingaguru.com
+DUMMY_USER_NAME=Demo Farmer
+DUMMY_USER_PHONE=+250700000000
+```
+
+#### Frontend (`frontend/.env.local`)
+
+```
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+```
 
 ## License
 

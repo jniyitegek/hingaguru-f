@@ -1,75 +1,82 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-
-type Farmland = {
-  id: string;
-  name: string;
-  area?: string;
-  crops: string[];
-  nextIrrigationDate?: string;
-  nextFertilizingDate?: string;
-  plannedPlantingDate?: string;
-};
+import { api, type Farmland } from "@/lib/api";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   farmlandId?: string | null;
+  onUpdated?: (farmland: Farmland) => void;
 };
 
-const STORAGE_KEY = "hingaguru_farmlands";
-
-export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId }: Props) {
+export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId, onUpdated }: Props) {
   const [farmland, setFarmland] = useState<Farmland | null>(null);
   const [irrigation, setIrrigation] = useState("");
   const [fertilizing, setFertilizing] = useState("");
   const [planting, setPlanting] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !farmlandId) return;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const list: Farmland[] = raw ? JSON.parse(raw) : [];
-      const f = list.find(x => x.id === farmlandId) || null;
-      setFarmland(f || null);
-      setIrrigation(f?.nextIrrigationDate || "");
-      setFertilizing(f?.nextFertilizingDate || "");
-      setPlanting(f?.plannedPlantingDate || "");
-    } catch {
-      setFarmland(null);
+    async function load() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await api.getFarmland(farmlandId);
+        setFarmland(data);
+        setIrrigation(data.nextIrrigationDate ? data.nextIrrigationDate.slice(0, 10) : "");
+        setFertilizing(data.nextFertilizingDate ? data.nextFertilizingDate.slice(0, 10) : "");
+        setPlanting(data.plannedPlantingDate ? data.plannedPlantingDate.slice(0, 10) : "");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to load farmland";
+        setError(message);
+        setFarmland(null);
+      } finally {
+        setLoading(false);
+      }
     }
+    load();
   }, [isOpen, farmlandId]);
 
-  function persist(updated: Farmland) {
+  async function saveAll() {
+    if (!farmland || saving) return;
+    setSaving(true);
+    setError(null);
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const list: Farmland[] = raw ? JSON.parse(raw) : [];
-      const next = list.map(f => (f.id === updated.id ? updated : f));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      window.dispatchEvent(new Event("farmlands:updated"));
-    } catch {
-      // ignore
+      const updated = await api.updateFarmland(farmland.id, {
+        nextIrrigationDate: irrigation || null,
+        nextFertilizingDate: fertilizing || null,
+        plannedPlantingDate: planting || null,
+      });
+      setFarmland(updated);
+      onUpdated?.(updated);
+      onClose();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to update schedule";
+      setError(message);
+    } finally {
+      setSaving(false);
     }
   }
 
-  function saveAll() {
-    if (!farmland) return;
-    const updated: Farmland = {
-      ...farmland,
-      nextIrrigationDate: irrigation || undefined,
-      nextFertilizingDate: fertilizing || undefined,
-      plannedPlantingDate: planting || undefined,
-    };
-    setFarmland(updated);
-    persist(updated);
-    onClose();
+  if (!isOpen) return null;
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+        <div className="relative z-10 w-full max-w-xl bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
+          <div className="text-gray-600 text-sm">Loading farmland…</div>
+        </div>
+      </div>
+    );
   }
-
-  if (!isOpen || !farmland) return null;
+  if (!farmland) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -81,18 +88,22 @@ export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId }: P
             <X />
           </button>
         </div>
+        {error && <div className="text-sm text-red-600 mb-3">{error}</div>}
         <div className="grid grid-cols-1 gap-4">
           <Input id="schedule-irrigation" variant="date" label="Next irrigation date" value={irrigation} onChange={setIrrigation} />
           <Input id="schedule-fertilizing" variant="date" label="Next fertilizing date" value={fertilizing} onChange={setFertilizing} />
           <Input id="schedule-planting" variant="date" label="Planned planting date" value={planting} onChange={setPlanting} />
         </div>
         <div className="flex justify-end mt-6 gap-2">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={saveAll}>Save</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={saveAll} disabled={saving}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-
 

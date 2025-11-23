@@ -1,28 +1,30 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-
-type Employee = {
-	id: string;
-	fullName: string;
-	role: string;
-	phone: string;
-};
+import { api, type Employee, type EmployeeStatus } from "@/lib/api";
 
 type EmployeesManagerProps = {
 	isOpen: boolean;
 	onClose: () => void;
+	onCreated?: (employee: Employee) => void;
 };
 
-const STORAGE_KEY = "hingaguru_employees";
+const STATUS_OPTIONS: Array<{ value: EmployeeStatus; label: string }> = [
+	{ value: "active", label: "Active" },
+	{ value: "on_leave", label: "On Leave" },
+	{ value: "inactive", label: "Inactive" },
+];
 
-export default function EmployeesManager({ isOpen, onClose }: EmployeesManagerProps) {
+export default function EmployeesManager({ isOpen, onClose, onCreated }: EmployeesManagerProps) {
 	const [fullName, setFullName] = useState("");
 	const [role, setRole] = useState("");
 	const [phone, setPhone] = useState("");
+	const [status, setStatus] = useState<EmployeeStatus>("active");
+	const [submitting, setSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const isValid = useMemo(() => {
 		return fullName.trim().length > 1 && role.trim().length > 1 && phone.trim().length >= 7;
@@ -32,28 +34,31 @@ export default function EmployeesManager({ isOpen, onClose }: EmployeesManagerPr
 		setFullName("");
 		setRole("");
 		setPhone("");
+		setStatus("active");
+		setError(null);
 	}
 
-	function handleAdd() {
-		if (!isValid) return;
-		const newEmployee: Employee = {
-			id: crypto.randomUUID(),
-			fullName: fullName.trim(),
-			role: role.trim(),
-			phone: phone.trim(),
-		};
+	async function handleAdd() {
+		if (!isValid || submitting) return;
+		setSubmitting(true);
+		setError(null);
+
 		try {
-			const raw = localStorage.getItem(STORAGE_KEY);
-			const current: Employee[] = raw ? JSON.parse(raw) : [];
-			const next = [newEmployee, ...current];
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-			// notify listeners (Employees page) to reload
-			window.dispatchEvent(new Event("employees:updated"));
-		} catch {
-			// ignore
+			const created = await api.createEmployee({
+				fullName: fullName.trim(),
+				role: role.trim(),
+				phone: phone.trim(),
+				status,
+			});
+			onCreated?.(created);
+			resetForm();
+			onClose();
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Failed to create employee";
+			setError(message);
+		} finally {
+			setSubmitting(false);
 		}
-		resetForm();
-		onClose();
 	}
 
 	if (!isOpen) return null;
@@ -68,17 +73,28 @@ export default function EmployeesManager({ isOpen, onClose }: EmployeesManagerPr
 						<X />
 					</button>
 				</div>
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+				<div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
 					<Input id="employee-fullname" label="Full name" value={fullName} onChange={setFullName} placeholder="Jane Doe" />
 					<Input id="employee-role" label="Role" value={role} onChange={setRole} placeholder="Field Supervisor" />
 					<Input id="employee-phone" label="Phone" value={phone} onChange={setPhone} placeholder="+250 7xx xxx xxx" />
+					<Input
+						id="employee-status"
+						label="Status"
+						variant="select"
+						value={status}
+						onChange={(value) => setStatus(value as EmployeeStatus)}
+						options={STATUS_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+					/>
 				</div>
-				<div className="flex justify-end">
-					<Button onClick={handleAdd} disabled={!isValid}>Add Employee</Button>
+				{error && <div className="text-sm text-red-600 mb-4">{error}</div>}
+				<div className="flex justify-end gap-2">
+					<Button variant="outline" onClick={onClose}>Cancel</Button>
+					<Button onClick={handleAdd} disabled={!isValid || submitting}>
+						{submitting ? "Saving..." : "Add Employee"}
+					</Button>
 				</div>
 			</div>
 		</div>
 	);
 }
-
 

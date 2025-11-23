@@ -4,29 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-
-type Employee = { id: string; fullName: string; role: string; phone: string };
-type Farmland = { id: string; name: string };
-
-export type FinanceTx = {
-  id: string;
-  type: "income" | "expense";
-  amountRwf: number;
-  date: string; // yyyy-mm-dd
-  category: string;
-  farmlandId?: string;
-  employeeId?: string;
-  note?: string;
-};
+import { api, type Employee, type Farmland, type FinanceTransaction } from "@/lib/api";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onSaved?: (transaction: FinanceTransaction) => void;
 };
-
-const EMP_STORAGE = "hingaguru_employees";
-const FARM_STORAGE = "hingaguru_farmlands";
-const TX_STORAGE = "hingaguru_transactions";
 
 const CATEGORY_OPTIONS = [
   { value: "general", label: "General" },
@@ -39,36 +23,44 @@ const CATEGORY_OPTIONS = [
   { value: "sales", label: "Sales" },
 ];
 
-export default function TransactionManager({ isOpen, onClose }: Props) {
+export default function TransactionManager({ isOpen, onClose, onSaved }: Props) {
   const [type, setType] = useState<"income" | "expense">("expense");
-  const [amount, setAmount] = useState<string>("");
-  const [date, setDate] = useState<string>("");
-  const [category, setCategory] = useState<string>("general");
-  const [note, setNote] = useState<string>("");
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState("");
+  const [category, setCategory] = useState("general");
+  const [note, setNote] = useState("");
   const [target, setTarget] = useState<"none" | "farmland" | "employee">("none");
-  const [farmlandId, setFarmlandId] = useState<string>("");
-  const [employeeId, setEmployeeId] = useState<string>("");
+  const [farmlandId, setFarmlandId] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [farmlands, setFarmlands] = useState<Farmland[]>([]);
+  const [loadingLists, setLoadingLists] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
-    try {
-      const rawE = localStorage.getItem(EMP_STORAGE);
-      setEmployees(rawE ? JSON.parse(rawE) : []);
-    } catch { setEmployees([]); }
-    try {
-      const rawF = localStorage.getItem(FARM_STORAGE);
-      const parsed = rawF ? JSON.parse(rawF) : [];
-      setFarmlands(parsed.map((f: any) => ({ id: f.id, name: f.name })));
-    } catch { setFarmlands([]); }
+    async function load() {
+      try {
+        setLoadingLists(true);
+        const [employeeList, farmlandList] = await Promise.all([api.getEmployees(), api.getFarmlands()]);
+        setEmployees(employeeList);
+        setFarmlands(farmlandList);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to load related data";
+        setError(message);
+      } finally {
+        setLoadingLists(false);
+      }
+    }
+    load();
   }, [isOpen]);
 
   const canSave = useMemo(() => {
     const amt = Number(amount);
-    return !Number.isNaN(amt) && amt > 0 && !!date;
-  }, [amount, date]);
+    return !Number.isNaN(amt) && amt > 0 && !!date && category.length > 0;
+  }, [amount, date, category]);
 
   function reset() {
     setType("expense");
@@ -79,31 +71,32 @@ export default function TransactionManager({ isOpen, onClose }: Props) {
     setTarget("none");
     setFarmlandId("");
     setEmployeeId("");
+    setError(null);
   }
 
-  function save() {
-    if (!canSave) return;
-    const record: FinanceTx = {
-      id: crypto.randomUUID(),
-      type,
-      amountRwf: Math.round(Number(amount)),
-      date,
-      category,
-      note: note.trim() || undefined,
-      farmlandId: target === "farmland" ? farmlandId || undefined : undefined,
-      employeeId: target === "employee" ? employeeId || undefined : undefined,
-    };
+  async function save() {
+    if (!canSave || submitting) return;
+    setSubmitting(true);
+    setError(null);
     try {
-      const raw = localStorage.getItem(TX_STORAGE);
-      const list = raw ? JSON.parse(raw) : [];
-      const next = [record, ...list];
-      localStorage.setItem(TX_STORAGE, JSON.stringify(next));
-      window.dispatchEvent(new Event("transactions:updated"));
-    } catch {
-      // ignore
+      const created = await api.createTransaction({
+        type,
+        amountRwf: Math.round(Number(amount)),
+        date,
+        category,
+        note: note.trim() || undefined,
+        farmlandId: target === "farmland" ? farmlandId || undefined : undefined,
+        employeeId: target === "employee" ? employeeId || undefined : undefined,
+      });
+      onSaved?.(created);
+      reset();
+      onClose();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save transaction";
+      setError(message);
+    } finally {
+      setSubmitting(false);
     }
-    reset();
-    onClose();
   }
 
   if (!isOpen) return null;
@@ -120,7 +113,17 @@ export default function TransactionManager({ isOpen, onClose }: Props) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-          <Input id="tx-type" label="Type" variant="select" value={type} onChange={(v) => setType(v as "income" | "expense")} options={[{ value: "expense", label: "Expense" }, { value: "income", label: "Income" }]} />
+          <Input
+            id="tx-type"
+            label="Type"
+            variant="select"
+            value={type}
+            onChange={(v) => setType(v as "income" | "expense")}
+            options={[
+              { value: "expense", label: "Expense" },
+              { value: "income", label: "Income" },
+            ]}
+          />
           <Input id="tx-amount" label="Amount (RWF)" variant="number" value={amount} onChange={setAmount} placeholder="10000" />
           <Input id="tx-date" label="Date" variant="date" value={date} onChange={setDate} />
           <div className="md:col-span-3">
@@ -135,15 +138,40 @@ export default function TransactionManager({ isOpen, onClose }: Props) {
           <label className="text-gray-900 font-medium">Assign to</label>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2">
-              <input type="radio" name="tx-target" checked={target === "none"} onChange={() => { setTarget("none"); setFarmlandId(""); setEmployeeId(""); }} />
+              <input
+                type="radio"
+                name="tx-target"
+                checked={target === "none"}
+                onChange={() => {
+                  setTarget("none");
+                  setFarmlandId("");
+                  setEmployeeId("");
+                }}
+              />
               <span className="text-gray-700">None</span>
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="tx-target" checked={target === "farmland"} onChange={() => { setTarget("farmland"); setEmployeeId(""); }} />
+              <input
+                type="radio"
+                name="tx-target"
+                checked={target === "farmland"}
+                onChange={() => {
+                  setTarget("farmland");
+                  setEmployeeId("");
+                }}
+              />
               <span className="text-gray-700">Farmland</span>
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="tx-target" checked={target === "employee"} onChange={() => { setTarget("employee"); setFarmlandId(""); }} />
+              <input
+                type="radio"
+                name="tx-target"
+                checked={target === "employee"}
+                onChange={() => {
+                  setTarget("employee");
+                  setFarmlandId("");
+                }}
+              />
               <span className="text-gray-700">Employee</span>
             </label>
           </div>
@@ -151,35 +179,52 @@ export default function TransactionManager({ isOpen, onClose }: Props) {
 
         {target === "farmland" && (
           <div className="max-h-40 overflow-auto pr-2 space-y-2 mb-4">
-            {farmlands.length === 0 && <div className="text-gray-500 text-sm">No farmlands.</div>}
-            {farmlands.map(f => (
-              <label key={f.id} className="flex items-center gap-2">
-                <input type="radio" name="tx-farmland" checked={farmlandId === f.id} onChange={() => setFarmlandId(f.id)} />
-                <span className="text-gray-700">{f.name}</span>
-              </label>
-            ))}
+            {loadingLists ? (
+              <div className="text-gray-500 text-sm">Loading farmlands…</div>
+            ) : farmlands.length === 0 ? (
+              <div className="text-gray-500 text-sm">No farmlands available.</div>
+            ) : (
+              farmlands.map((f) => (
+                <label key={f.id} className="flex items-center gap-2">
+                  <input type="radio" name="tx-farmland" checked={farmlandId === f.id} onChange={() => setFarmlandId(f.id)} />
+                  <span className="text-gray-700">{f.name}</span>
+                </label>
+              ))
+            )}
           </div>
         )}
 
         {target === "employee" && (
           <div className="max-h-40 overflow-auto pr-2 space-y-2 mb-4">
-            {employees.length === 0 && <div className="text-gray-500 text-sm">No employees.</div>}
-            {employees.map(e => (
-              <label key={e.id} className="flex items-center gap-2">
-                <input type="radio" name="tx-employee" checked={employeeId === e.id} onChange={() => setEmployeeId(e.id)} />
-                <span className="text-gray-700">{e.fullName} ({e.role})</span>
-              </label>
-            ))}
+            {loadingLists ? (
+              <div className="text-gray-500 text-sm">Loading employees…</div>
+            ) : employees.length === 0 ? (
+              <div className="text-gray-500 text-sm">No employees available.</div>
+            ) : (
+              employees.map((e) => (
+                <label key={e.id} className="flex items-center gap-2">
+                  <input type="radio" name="tx-employee" checked={employeeId === e.id} onChange={() => setEmployeeId(e.id)} />
+                  <span className="text-gray-700">
+                    {e.fullName} ({e.role})
+                  </span>
+                </label>
+              ))
+            )}
           </div>
         )}
 
+        {error && <div className="text-sm text-red-600 mb-4">{error}</div>}
+
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={save} disabled={!canSave}>Save</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={save} disabled={!canSave || submitting}>
+            {submitting ? "Saving…" : "Save"}
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-
 
