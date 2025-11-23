@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/Input";
 import { Image as ImageIcon, Send, Bot, User as UserIcon, Sparkles } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import Markdown from "react-markdown";
 
 type ChatMessage = {
   id: string;
@@ -20,7 +21,7 @@ const STORAGE_KEY = "hingaguru_ai_chat";
 export default function AiToolsClient() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [model, setModel] = useState<"openai" | "gemini">("openai");
+  const [model, setModel] = useState<"gemini">("gemini");
   const [isSending, setIsSending] = useState(false);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -129,7 +130,7 @@ export default function AiToolsClient() {
                 value={model}
                 onChange={(v) => setModel(v as "openai" | "gemini")}
                 options={[
-                  { value: "openai", label: "GPT (OpenAI)" },
+                  // { value: "openai", label: "GPT (OpenAI)" },
                   { value: "gemini", label: "Gemini" },
                 ]}
               />
@@ -147,7 +148,7 @@ export default function AiToolsClient() {
                       {m.imageDataUrl && (
                         <img src={m.imageDataUrl} alt="uploaded" className="rounded mb-2 max-h-64 object-cover" />
                       )}
-                      <div className="whitespace-pre-wrap">{m.text}</div>
+                      <div className="whitespace-pre-wrap"><Markdown>{m.text}</Markdown></div>
                       <div className={`text-[10px] mt-1 ${m.role === "user" ? "text-white/80" : "text-gray-500"}`}>
                         {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>

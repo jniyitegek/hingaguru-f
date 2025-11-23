@@ -50,6 +50,21 @@ export default function FarmlandManager({ isOpen, onClose, onCreated }: Props) {
         nextFertilizingDate: nextFertilizingDate || undefined,
         plannedPlantingDate: plannedPlantingDate || undefined,
       });
+      // create todos for provided dates
+      try {
+        if (nextIrrigationDate) {
+          await api.createTask({ title: `Irrigate ${created.name}`, dueDate: nextIrrigationDate, farmlandId: created.id });
+        }
+        if (nextFertilizingDate) {
+          await api.createTask({ title: `Fertilize ${created.name}`, dueDate: nextFertilizingDate, farmlandId: created.id });
+        }
+        if (plannedPlantingDate) {
+          await api.createTask({ title: `Plant on ${created.name}`, dueDate: plannedPlantingDate, farmlandId: created.id });
+        }
+      } catch (e) {
+        // ignore task creation errors — do not block farmland creation
+        console.error('Failed to create related tasks', e);
+      }
       onCreated?.(created);
       resetForm();
       onClose();

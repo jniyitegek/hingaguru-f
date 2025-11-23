@@ -1,4 +1,5 @@
 import { ChevronRight, Sprout } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   score?: number;
@@ -39,12 +40,15 @@ const FarmlandHealth = ({ score = 0, status = "watch", loading = false, onView }
         <div className={`w-2 h-2 rounded-full ${badgeClass.split(" ")[0]}`} />
         <span className={`text-sm font-medium ${badgeClass.split(" ")[1]}`}>{loading ? "Loading…" : label}</span>
       </div>
-      <button
-        onClick={onView}
-        className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
-      >
-        View All Farmlands <ChevronRight size={16} />
-      </button>
+      <Link
+        href={"/dashboard/farmlands"}
+        >
+        <button
+          className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+        >
+          View All Farmlands <ChevronRight size={16} />
+        </button>
+        </Link>
     </div>
   );
 };

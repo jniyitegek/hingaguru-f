@@ -1,8 +1,9 @@
 "use client"
-import { Users, Grid3x3, Sprout, DollarSign, Briefcase, Wrench, LogOut } from 'lucide-react';
+import { Users, Grid3x3, Sprout, DollarSign, Briefcase, Wrench, LogOut, Settings as SettingsIcon } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from '@/context/AuthContext';
 
 
 interface NavItem {
@@ -16,6 +17,8 @@ interface NavItem {
 const Nav = () => {
 
         const pathname = usePathname();
+        const router = useRouter();
+        const { logout } = useAuth();
     
         const navItems: NavItem[] = [
             { id: 'dashboard', label: 'Dashboard', icon: Grid3x3, href: "/dashboard" },
@@ -30,8 +33,8 @@ const Nav = () => {
         <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex items-center gap-2">
-                        <Image src="/logo.png" alt="Hingaguru Logo" width={32} height={32} />
-                        <span className="text-2xl font-bold text-gray-800">Hingaguru</span>
+                        <Image src="/logo.png" alt="Hingaguru Logo" width={120} height={32} />
+                        {/* <span className="text-2xl font-bold text-gray-800">Hingaguru</span> */}
                     </div>
                 </div>
 
@@ -56,8 +59,20 @@ const Nav = () => {
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-gray-200">
-                    <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <div className="p-4 border-t border-gray-200 space-y-1">
+                    <Link 
+                        href="/settings"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                    >
+                        <SettingsIcon size={20} />
+                        <span className="font-medium">Settings</span>
+                    </Link>
+                    <button 
+                        onClick={async () => {
+                            await logout();
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                    >
                         <LogOut size={20} />
                         <span className="font-medium">Logout</span>
                     </button>

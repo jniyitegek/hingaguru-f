@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarPlus, FileText, Sprout, Users } from "lucide-react";
 import Nav from "@/components/common/Nav";
 import AuthNav from "@/components/common/AuthNav";
+import { useAuth } from "@/context/AuthContext";
 import EmployeeOverview from "@/components/sections/EmployeeOverview";
 import FarmlandHealth from "@/components/sections/FarmlandHealth";
 import FinancialSnapshot from "@/components/sections/Finances";
@@ -13,6 +14,7 @@ import GlobalScheduler from "@/components/sections/scheduling/GlobalScheduler.cl
 import ScanCropModal from "@/components/sections/crops/ScanCropModal.client";
 import TransactionManager from "@/components/sections/finances/TransactionManager.client";
 import { api, type DashboardSummary, type FinanceTransaction } from "@/lib/api";
+import Link from "next/link";
 
 type ChartPoint = {
   label: string;
@@ -71,6 +73,8 @@ function buildChartData(transactions: FinanceTransaction[]): ChartPoint[] {
 }
 
 export default function DashboardClient() {
+  const { user } = useAuth();
+  const firstName = user?.name?.split(" ")[0] ?? "Visualizer";
   const [showEmployees, setShowEmployees] = useState(false);
   const [showScheduler, setShowScheduler] = useState(false);
   const [showScan, setShowScan] = useState(false);
@@ -108,7 +112,7 @@ export default function DashboardClient() {
         <div className="p-8">
           <div className="flex items-start justify-between mb-8 text-black">
             <div>
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">Welcome back, Visualizer!</h1>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">Welcome back, {firstName}!</h1>
               <p className="text-gray-500">
                 {new Date().toLocaleDateString("en-US", {
                   weekday: "long",
@@ -140,13 +144,16 @@ export default function DashboardClient() {
                 <FileText size={18} />
                 <span className="font-medium">Log Expense</span>
               </button>
-              <button
-                onClick={() => setShowScan(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Sprout size={18} />
-                <span className="font-medium">Scan Crop Disease</span>
-              </button>
+              <Link
+                href={"/dashboard/ai-tools"}
+                >
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <Sprout size={18} />
+                  <span className="font-medium">Scan Crop Disease</span>
+                </button>
+                </Link>
             </div>
           </div>
 
@@ -176,7 +183,7 @@ export default function DashboardClient() {
             }}
           />
 
-          <div className="mt-6 bg-white rounded-xl p-6 border border-gray-200">
+          {/* <div className="mt-6 bg-white rounded-xl p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-800">Current Crop Cycle</h3>
               <button className="text-green-600 font-medium hover:text-green-700" onClick={() => window.open("/dashboard/crops", "_self")}>
@@ -188,7 +195,7 @@ export default function DashboardClient() {
                 ? `Upcoming field activities scheduled for ${summary.farmlands.upcomingSchedules.length} farmland(s) within the next 7 days.`
                 : "No upcoming field activities scheduled in the next 7 days."}
             </p>
-          </div>
+          </div> */}
         </div>
 
         <EmployeesManager

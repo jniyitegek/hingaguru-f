@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const useOpenAI = model === "openai";
     const openaiKey = process.env.OPENAI_API_KEY;
-    const geminiKey = "AIzaSyBtRIaiDxzVo5K_A39dx_P_5_2ZRRgrkb0";
+    const geminiKey = "AIzaSyBXscMVE5rU_Ny5QcbiW5Ur45fqbm6sJo4";
 
     if (useOpenAI && openaiKey) {
       const payload: any = {
@@ -39,28 +39,49 @@ export async function POST(req: NextRequest) {
     }
 
     if (!useOpenAI && geminiKey) {
-      const parts: any[] = [{ text: messages[messages.length - 1]?.content || "" }];
-      if (imageDataUrl) {
-        // send as inline data
-        const base64 = imageDataUrl.split(",")[1];
-        parts.push({
-          inline_data: {
-            mime_type: "image/jpeg",
-            data: base64,
+const systemPrompt = {
+    role: "user",
+    parts: [
+        {
+            text:
+                "Be concise and straight to the point. No lengthy responses. " +
+                "You are an expert in agriculture and agricultural business management. " +
+                "Every response must be strictly about agriculture or agricultural management " +
+                "(crops, livestock, soil, agronomy, farm finance, farm operations, labor management, etc). " +
+                "If the question is not related to agriculture or agricultural business management, respond: " +
+                "\"I only answer agriculture and agricultural-management questions.\""
+        }
+    ]
+};
+
+const parts = [
+    { text: messages[messages.length - 1]?.content || "" },
+    imageDataUrl
+        ? {
+              inline_data: {
+                  mime_type: "image/jpeg",
+                  data: imageDataUrl.split(",")[1]
+              }
           }
-        });
-      }
-      const payload = {
-        contents: [
-          ...messages.slice(0, -1).map((m: any) => ({ role: m.role === "user" ? "user" : "model", parts: [{ text: m.content }] })),
-          { role: "user", parts }
-        ]
-      };
-      const resp = await fetch(`${GEMINI_URL}?key=${geminiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+        : undefined
+].filter(Boolean);
+
+const payload = {
+    contents: [
+        systemPrompt,
+        ...messages.slice(0, -1).map((m) => ({
+            role: m.role === "user" ? "user" : "model",
+            parts: [{ text: m.content }]
+        })),
+        { role: "user", parts }
+    ]
+};
+
+const resp = await fetch(`${GEMINI_URL}?key=${geminiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+});
       const data = await resp.json();
       console.log("Gemini raw response:", data);
       const reply = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join("\n") ?? "I couldn't generate a response.";

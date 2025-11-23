@@ -9,6 +9,18 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
+  // attach Authorization header from localStorage token when present
+  try {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+    }
+  } catch {
+    // ignore localStorage access errors
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers,
@@ -83,6 +95,35 @@ export const api = {
 
   getDashboardSummary: () => apiFetch<DashboardSummary>("/api/dashboard/summary"),
   getCrops: () => apiFetch<CropInfo[]>("/api/crops"),
+  getCrop: (id: string) => apiFetch<CropInfo>(`/api/crops/${id}`),
+  createCrop: (body: JsonBody) =>
+    apiFetch<CropInfo>("/api/crops", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  // Tasks
+  getTasks: async () => {
+    const raw = await apiFetch<any[]>("/api/tasks");
+    return raw.map((r: any) => ({ ...r, id: r.id ?? r._id }));
+  },
+  createTask: async (body: JsonBody) => {
+    const raw = await apiFetch<any>("/api/tasks", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return { ...raw, id: raw.id ?? raw._id };
+  },
+  updateTask: async (id: string, body: JsonBody) => {
+    const raw = await apiFetch<any>(`/api/tasks/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+    return { ...raw, id: raw.id ?? raw._id };
+  },
+  deleteTask: (id: string) =>
+    apiFetch<{ id: string; message: string }>(`/api/tasks/${id}`, {
+      method: "DELETE",
+    }),
 };
 
 export type EmployeeStatus = "active" | "on_leave" | "inactive";
@@ -177,6 +218,18 @@ export type DashboardSummary = {
     balance: number;
     recent: FinanceTransaction[];
   };
+};
+
+export type Task = {
+  id: string;
+  title: string;
+  note?: string;
+  dueDate?: string;
+  priority: "low" | "medium" | "high";
+  status: "pending" | "completed";
+  farmlandId?: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 

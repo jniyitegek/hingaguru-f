@@ -7,6 +7,16 @@
   --color-primary: #228B22;
   --color-primary-600: #228B22;
   --color-primary-700: #228B22;
+  --color-green-50: var(--color-blue-50);
+  --color-green-100: var(--color-blue-100);
+  --color-green-200: var(--color-blue-200);
+  --color-green-300: var(--color-blue-300);
+  --color-green-400: var(--color-blue-400);
+  --color-green-500: var(--color-blue-500);
+  --color-green-600: var(--color-blue-600);
+  --color-green-700: var(--color-blue-700);
+  --color-green-800: var(--color-blue-800);
+  --color-green-900: var(--color-blue-900);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -49,6 +59,20 @@
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
+  :root {
+    --color-blue-50:  #f2f7ff;
+    --color-blue-100: #e6f0ff;
+    --color-blue-200: #c7dfff;
+    --color-blue-300: #9cc6ff;
+    --color-blue-400: #6ea7ff;
+
+    --color-blue-500: #4a91fa;
+    --color-blue-600: #3c7de6; /* your provided */
+    --color-blue-700: #3274de; /* your provided */
+
+    --color-blue-800: #2a67c9;
+    --color-blue-900: #204d94;
+}
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);

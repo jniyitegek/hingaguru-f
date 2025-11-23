@@ -37,12 +37,6 @@ const EmployeeOverview = ({ onManageTeam, loading = false, data }: Props) => {
           <div className="text-xs text-gray-500">On Leave</div>
         </div>
       </div>
-      <button
-        onClick={onManageTeam}
-        className="text-green-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
-      >
-        Manage Team <ChevronRight size={16} />
-      </button>
     </div>
   );
 };

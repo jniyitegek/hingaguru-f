@@ -1,4 +1,5 @@
 import { FlaskConical, Sprout, Wrench } from "lucide-react";
+import Link from "next/link";
 
 const AISuggestion = () => {
     return ( 
@@ -9,14 +10,14 @@ const AISuggestion = () => {
             </div>
             <p className="text-gray-600 text-sm mb-6">Get intelligent insights to optimize your farm&apos;s performance.</p>
             <div className="space-y-3">
-                <button className="w-full flex items-center gap-3 px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
+                {/* <button className="w-full flex items-center gap-3 px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
                     <Sprout size={18} />
                     <span className="font-medium text-sm">Get Crop Suggestions</span>
-                </button>
-                <button className="w-full flex items-center gap-3 px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
+                </button> */}
+                <Link href="/dashboard/ai-tools" className="w-full flex items-center gap-3 px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
                     <FlaskConical size={18} />
-                    <span className="font-medium text-sm">Identify Disease with AI</span>
-                </button>
+                    <span className="font-medium text-sm">Identify Diseases with AI</span>
+                </Link>
             </div>
         </div>
      );
