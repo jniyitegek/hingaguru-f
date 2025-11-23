@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, Sprout, Trash2, Plus } from "lucide-react";
 import Nav from "@/components/common/Nav";
 import AuthNav from "@/components/common/AuthNav";
+import { useLocale } from "@/context/LocaleContext";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/Input";
 import FarmlandManager from "@/components/sections/farmlands/FarmlandManager.client";
@@ -11,6 +12,7 @@ import FarmlandScheduleModal from "@/components/sections/farmlands/FarmlandSched
 import { api, type Farmland } from "@/lib/api";
 
 export default function FarmlandsClient() {
+  const { t } = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [farmlands, setFarmlands] = useState<Farmland[]>([]);
   const [scheduleModalId, setScheduleModalId] = useState<string | null>(null);
@@ -76,15 +78,15 @@ export default function FarmlandsClient() {
         <div className="p-8">
           <div className="flex items-start justify-between mb-8 text-black">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Farmlands</h1>
-              <p className="text-gray-500">Track plots, planted crops, and irrigation schedules</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("farmlands.title")}</h1>
+              <p className="text-gray-500">{t("farmlands.subtitle")}</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-72">
-                <Input id="search-farmlands" placeholder="Search by name, crops, area" value={query} onChange={setQuery} />
+                <Input id="search-farmlands" placeholder={t("farmlands.searchPlaceholder")} value={query} onChange={setQuery} />
               </div>
               <Button onClick={() => setIsOpen(true)}>
-                <Plus className="mr-2" /> Add Farmland
+                <Plus className="mr-2" /> {t("nav.addFarmland")}
               </Button>
             </div>
           </div>
@@ -94,17 +96,17 @@ export default function FarmlandsClient() {
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="text-4xl font-bold text-gray-800 mb-1">{farmlands.length}</div>
-              <div className="text-gray-500 text-sm">Total Farmlands</div>
+              <div className="text-gray-500 text-sm">{t("farmlands.totalFarmlands")}</div>
             </div>
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="text-4xl font-bold text-gray-800 mb-1">{totalCrops}</div>
-              <div className="text-gray-500 text-sm">Crop Types</div>
+              <div className="text-gray-500 text-sm">{t("farmlands.cropTypes")}</div>
             </div>
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="text-4xl font-bold text-gray-800 mb-1">
                 {farmlands.filter((f) => !!f.nextIrrigationDate).length}
               </div>
-              <div className="text-gray-500 text-sm">Scheduled Irrigations</div>
+              <div className="text-gray-500 text-sm">{t("farmlands.scheduledIrrigations")}</div>
             </div>
           </div>
 
@@ -116,10 +118,10 @@ export default function FarmlandsClient() {
               <div className="col-span-1 text-right">Actions</div>
             </div>
             {loading ? (
-              <div className="px-6 py-8 text-gray-500 text-sm">Loading farmlands…</div>
+              <div className="px-6 py-8 text-gray-500 text-sm">{t("farmlands.loading")}</div>
             ) : filtered.length === 0 ? (
               <div className="px-6 py-8 text-gray-500 text-sm">
-                {farmlands.length === 0 ? "No farmlands yet." : "No farmlands match your search."}
+                {farmlands.length === 0 ? t("farmlands.noFarmlands") : t("farmlands.noMatch")}
               </div>
             ) : (
               filtered.map((f) => (

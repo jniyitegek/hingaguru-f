@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { X, Camera, Image as ImageIcon, Send, ArrowRight } from "lucide-react";
 import Input from "@/components/ui/Input";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/context/LocaleContext";
 
 type Props = {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function ScanCropModal({ isOpen, onClose }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { t } = useLocale();
 
   if (!isOpen) return null;
 
@@ -83,7 +85,7 @@ export default function ScanCropModal({ isOpen, onClose }: Props) {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative z-10 w-full max-w-2xl bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Scan Crop Disease</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t("common.scanCrop")}</h3>
           <button aria-label="Close" onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X />
           </button>
@@ -92,19 +94,19 @@ export default function ScanCropModal({ isOpen, onClose }: Props) {
           <div className="flex gap-2">
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
             <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={onFile} />
-            <Button variant="outline" onClick={pickImage}><ImageIcon className="mr-2" /> Upload</Button>
-            <Button variant="outline" onClick={useCamera}><Camera className="mr-2" /> Use Camera</Button>
+            <Button variant="outline" onClick={pickImage}><ImageIcon className="mr-2" /> {t("buttons.upload")}</Button>
+            <Button variant="outline" onClick={useCamera}><Camera className="mr-2" /> {t("buttons.useCamera")}</Button>
           </div>
           {imageDataUrl && (
             <div className="flex items-center gap-3">
               <img src={imageDataUrl} alt="preview" className="h-24 w-24 object-cover rounded" />
-              <button className="text-sm text-red-600" onClick={() => setImageDataUrl(null)}>Remove</button>
+              <button className="text-sm text-red-600" onClick={() => setImageDataUrl(null)}>{t("buttons.remove")}</button>
             </div>
           )}
-          <Input id="scan-note" label="Notes (optional)" value={note} onChange={setNote} placeholder="Describe symptoms, crop name, location..." />
+          <Input id="scan-note" label={t("common.scanCrop") + " - " + "Notes (optional)"} value={note} onChange={setNote} placeholder={t("crops.searchPlaceholder")} />
           <div className="flex gap-2">
-            <Button onClick={analyze} disabled={!imageDataUrl || loading}><Send className="mr-2" /> {loading ? "Analyzing..." : "Analyze on Dashboard"}</Button>
-            <Button variant="outline" onClick={openInAiTools} disabled={!imageDataUrl}><ArrowRight className="mr-2" /> Open in AI Tools</Button>
+            <Button onClick={analyze} disabled={!imageDataUrl || loading}><Send className="mr-2" /> {loading ? t("crops.analyzing") : t("crops.analyzeOnDashboard")}</Button>
+            <Button variant="outline" onClick={openInAiTools} disabled={!imageDataUrl}><ArrowRight className="mr-2" /> {t("buttons.openInAiTools")}</Button>
           </div>
           {answer && (
             <div className="mt-3 p-3 border rounded-lg bg-gray-50 text-gray-800 whitespace-pre-wrap">

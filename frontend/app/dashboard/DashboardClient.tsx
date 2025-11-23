@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarPlus, FileText, Sprout, Users } from "lucide-react";
 import Nav from "@/components/common/Nav";
 import AuthNav from "@/components/common/AuthNav";
+import { useLocale } from "@/context/LocaleContext";
 import { useAuth } from "@/context/AuthContext";
 import EmployeeOverview from "@/components/sections/EmployeeOverview";
 import FarmlandHealth from "@/components/sections/FarmlandHealth";
@@ -75,6 +76,7 @@ function buildChartData(transactions: FinanceTransaction[]): ChartPoint[] {
 export default function DashboardClient() {
   const { user } = useAuth();
   const firstName = user?.name?.split(" ")[0] ?? "Visualizer";
+  const { t } = useLocale();
   const [showEmployees, setShowEmployees] = useState(false);
   const [showScheduler, setShowScheduler] = useState(false);
   const [showScan, setShowScan] = useState(false);
@@ -112,7 +114,7 @@ export default function DashboardClient() {
         <div className="p-8">
           <div className="flex items-start justify-between mb-8 text-black">
             <div>
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">Welcome back, {firstName}!</h1>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">{t("dashboard.welcome", { name: firstName })}</h1>
               <p className="text-gray-500">
                 {new Date().toLocaleDateString("en-US", {
                   weekday: "long",
@@ -128,30 +130,30 @@ export default function DashboardClient() {
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Users size={18} />
-                <span className="font-medium">Add New Employee</span>
+                <span className="font-medium">{t("common.addNewEmployee")}</span>
               </button>
               <button
                 onClick={() => setShowScheduler(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <CalendarPlus size={18} />
-                <span className="font-medium">Schedule Event</span>
+                <span className="font-medium">{t("common.scheduleEvent")}</span>
               </button>
               <button
                 onClick={() => setShowTx(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <FileText size={18} />
-                <span className="font-medium">Log Expense</span>
+                <span className="font-medium">{t("common.logExpense")}</span>
               </button>
               <Link
                 href={"/dashboard/ai-tools"}
                 >
                 <button
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                   <Sprout size={18} />
-                  <span className="font-medium">Scan Crop Disease</span>
+                  <span className="font-medium">{t("common.scanCrop")}</span>
                 </button>
                 </Link>
             </div>

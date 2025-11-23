@@ -4,11 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Sprout, ThermometerSun, CloudRain, ShieldAlert, TrendingUp, BookOpen, MapPin } from "lucide-react";
 import Nav from "@/components/common/Nav";
 import AuthNav from "@/components/common/AuthNav";
+import { useLocale } from "@/context/LocaleContext";
 import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { api, type CropInfo } from "@/lib/api";
 
 export default function CropsClient() {
+  const { t } = useLocale();
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [districtId, setDistrictId] = useState<string>("0");
@@ -211,11 +213,11 @@ export default function CropsClient() {
         <div className="p-8">
           <div className="flex items-start justify-between mb-8 text-black">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Crops Intelligence</h1>
-              <p className="text-gray-500">Diseases, optimal conditions, and market insights</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("crops.title")}</h1>
+              <p className="text-gray-500">{t("crops.subtitle")}</p>
             </div>
-            <div className="w-80">
-              <Input id="search-crops" variant="text" placeholder="Search crops, diseases, tips..." value={query} onChange={setQuery} />
+              <div className="w-80">
+              <Input id="search-crops" variant="text" placeholder={t("crops.searchPlaceholder")} value={query} onChange={setQuery} />
             </div>
             {/* <div className="ml-4">
               <Button onClick={() => setIsAddOpen(true)}>Add crop</Button>
@@ -259,9 +261,9 @@ export default function CropsClient() {
                 <div className="px-6 py-3 border-b text-gray-700 font-medium">Crop Library</div>
                 <div className="max-h-[520px] overflow-auto">
                   {loading ? (
-                    <div className="px-6 py-8 text-sm text-gray-500">Loading crops…</div>
+                    <div className="px-6 py-8 text-sm text-gray-500">{t("crops.loading")}</div>
                   ) : filtered.length === 0 ? (
-                    <div className="px-6 py-8 text-sm text-gray-500">No matches.</div>
+                    <div className="px-6 py-8 text-sm text-gray-500">{t("crops.noMatches")}</div>
                   ) : (
                     filtered.map((crop) => (
                       <button
@@ -397,10 +399,10 @@ export default function CropsClient() {
 
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => setIsAddOpen(false)}>
-                    Cancel
+                    {t("nav.cancel")}
                   </Button>
                   <Button onClick={handleCreateCrop} disabled={submittingNew || !newName.trim()}>
-                    {submittingNew ? "Saving…" : "Add Crop"}
+                    {submittingNew ? t("buttons.saving") : t("crops.addCrop")}
                   </Button>
                 </div>
               </div>

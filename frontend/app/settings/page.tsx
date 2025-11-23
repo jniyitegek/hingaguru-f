@@ -6,9 +6,11 @@ import { toast, Toaster } from 'sonner';
 import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/Input';
 import Nav from '@/components/common/Nav';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function SettingsPage() {
   const { user, updateProfile } = useAuth();
+  const { t } = useLocale();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -89,12 +91,12 @@ const handleChange = (name: string, value: string) => {
       <Nav />
       <Toaster position={`top-center`} />
       <div className="p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-8">Account Settings</h1>
+  <h1 className="text-2xl font-bold text-gray-800 mb-8">{t("settings.title")}</h1>
         
         <div className="max-w-2xl space-y-8">
           {/* Profile Information */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Profile Information</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">{t("settings.profileTitle")}</h2>
             <form onSubmit={handleProfileUpdate} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -139,7 +141,7 @@ const handleChange = (name: string, value: string) => {
               </div>
               <div className="pt-2">
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
+                  {isLoading ? t("buttons.saving") : t("buttons.save")}
                 </Button>
               </div>
             </form>
@@ -147,7 +149,7 @@ const handleChange = (name: string, value: string) => {
 
           {/* Change Password */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Change Password</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">{t("settings.changePasswordTitle")}</h2>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div>
                 <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
@@ -192,7 +194,7 @@ const handleChange = (name: string, value: string) => {
               </div>
               <div className="pt-2">
                 <Button type="submit" variant="outline" disabled={isLoading}>
-                  {isLoading ? 'Updating...' : 'Update Password'}
+                  {isLoading ? t("buttons.saving") : t("buttons.updatePassword")}
                 </Button>
               </div>
             </form>

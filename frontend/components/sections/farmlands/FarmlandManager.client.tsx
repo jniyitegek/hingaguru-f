@@ -5,6 +5,7 @@ import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { api, type Farmland } from "@/lib/api";
+import { useLocale } from "@/context/LocaleContext";
 
 type Props = {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export default function FarmlandManager({ isOpen, onClose, onCreated }: Props) {
   const isValid = useMemo(() => {
     return name.trim().length > 1;
   }, [name]);
+  const { t } = useLocale();
 
   function resetForm() {
     setName("");
@@ -83,33 +85,33 @@ export default function FarmlandManager({ isOpen, onClose, onCreated }: Props) {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative z-10 w-full max-w-2xl bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Add Farmland</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t("farmland.addFarmland")}</h3>
           <button aria-label="Close" onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X />
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-          <Input id="farmland-name" label="Farmland name" value={name} onChange={setName} required placeholder="North Plot" />
-          <Input id="farmland-area" label="Area (e.g., 2.5 ha)" value={area} onChange={setArea} placeholder="2 ha" />
-          <Input id="farmland-crops" label="Crops (comma-separated)" value={crops} onChange={setCrops} placeholder="Maize, Beans" />
+          <Input id="farmland-name" label={t("farmland.nameLabel")} value={name} onChange={setName} required placeholder={t("farmland.namePlaceholder")} />
+          <Input id="farmland-area" label={t("farmland.areaLabel")} value={area} onChange={setArea} placeholder={t("farmland.areaPlaceholder")} />
+          <Input id="farmland-crops" label={t("farmland.cropsLabel")} value={crops} onChange={setCrops} placeholder={t("farmland.cropsPlaceholder")} />
           <Input
             id="farmland-next-irrigation"
             variant="date"
-            label="Next irrigation date"
+            label={t("farmland.nextIrrigation")}
             value={nextIrrigationDate}
             onChange={setNextIrrigationDate}
           />
           <Input
             id="farmland-next-fertilizing"
             variant="date"
-            label="Next fertilizing date"
+            label={t("farmland.nextFertilizing")}
             value={nextFertilizingDate}
             onChange={setNextFertilizingDate}
           />
           <Input
             id="farmland-planting-date"
             variant="date"
-            label="Planned planting date"
+            label={t("farmland.plannedPlanting")}
             value={plannedPlantingDate}
             onChange={setPlannedPlantingDate}
           />
@@ -117,10 +119,10 @@ export default function FarmlandManager({ isOpen, onClose, onCreated }: Props) {
         {error && <div className="text-sm text-red-600 mb-4">{error}</div>}
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t("buttons.cancel")}
           </Button>
           <Button onClick={handleAdd} disabled={!isValid || submitting}>
-            {submitting ? "Saving…" : "Add Farmland"}
+            {submitting ? t("farmland.saving") : t("nav.addFarmland")}
           </Button>
         </div>
       </div>

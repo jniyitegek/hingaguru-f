@@ -5,6 +5,7 @@ import Input from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { api, type Farmland } from "@/lib/api";
+import { useLocale } from "@/context/LocaleContext";
 
 type Props = {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId, onU
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const { t } = useLocale();
 
   useEffect(() => {
     if (!isOpen || !farmlandId) return;
@@ -28,7 +30,7 @@ export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId, onU
       try {
         setLoading(true);
         setError(null);
-        const data = await api.getFarmland(farmlandId);
+  const data = await api.getFarmland(farmlandId!);
         setFarmland(data);
         setIrrigation(data.nextIrrigationDate ? data.nextIrrigationDate.slice(0, 10) : "");
         setFertilizing(data.nextFertilizingDate ? data.nextFertilizingDate.slice(0, 10) : "");
@@ -71,7 +73,7 @@ export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId, onU
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <div className="absolute inset-0 bg-black/40" onClick={onClose} />
         <div className="relative z-10 w-full max-w-xl bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
-          <div className="text-gray-600 text-sm">Loading farmland…</div>
+          <div className="text-gray-600 text-sm">{t("farmland.loading")}</div>
         </div>
       </div>
     );
@@ -83,23 +85,23 @@ export default function FarmlandScheduleModal({ isOpen, onClose, farmlandId, onU
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative z-10 w-full max-w-xl bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Schedule for {farmland.name}</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t("farmland.scheduleFor", { name: farmland.name })}</h3>
           <button aria-label="Close" onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X />
           </button>
         </div>
         {error && <div className="text-sm text-red-600 mb-3">{error}</div>}
         <div className="grid grid-cols-1 gap-4">
-          <Input id="schedule-irrigation" variant="date" label="Next irrigation date" value={irrigation} onChange={setIrrigation} />
-          <Input id="schedule-fertilizing" variant="date" label="Next fertilizing date" value={fertilizing} onChange={setFertilizing} />
-          <Input id="schedule-planting" variant="date" label="Planned planting date" value={planting} onChange={setPlanting} />
+          <Input id="schedule-irrigation" variant="date" label={t("farmland.nextIrrigation")} value={irrigation} onChange={setIrrigation} />
+          <Input id="schedule-fertilizing" variant="date" label={t("farmland.nextFertilizing")} value={fertilizing} onChange={setFertilizing} />
+          <Input id="schedule-planting" variant="date" label={t("farmland.plannedPlanting")} value={planting} onChange={setPlanting} />
         </div>
         <div className="flex justify-end mt-6 gap-2">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t("buttons.cancel")}
           </Button>
           <Button onClick={saveAll} disabled={saving}>
-            {saving ? "Saving…" : "Save"}
+            {saving ? t("buttons.saving") : t("buttons.save")}
           </Button>
         </div>
       </div>

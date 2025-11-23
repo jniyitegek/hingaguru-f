@@ -1,0 +1,125 @@
+{
+  "nav": {
+    "upcomingTasks": "Imirimo iteganyijwe",
+    "add": "Ongeraho",
+    "cancel": "Guhagarika",
+    "addFarmland": "Ongeraho umurima",
+    "language": "Ururimi"
+  },
+  "tasks": {
+    "loading": "Birimo gupakurura imirimo…",
+    "noTasks": "Nta mirimo iriho.",
+    "markDone": "Irangiza",
+    "undo": "Subiza inyuma",
+    "delete": "Siba",
+    "taskCreated": "Umurimo wongewemo"
+  },
+  "farmland": {
+    "namePlaceholder": "Urubuga rwa Ruguru",
+    "areaPlaceholder": "2 ha",
+    "cropsPlaceholder": "Ibinyampeke, Amashu",
+    "nextIrrigation": "Itariki yo gutera amazi",
+    "nextFertilizing": "Itariki yo gusiga ifumbire",
+  "plannedPlanting": "Itariki yateganyijwe yo gutera",
+  "saving": "Birimo kubika…",
+  "addFarmland": "Ongeraho umurima",
+  "nameLabel": "Izina ry'umurima",
+  "areaLabel": "Ubuso (urugero: 2.5 ha)",
+  "cropsLabel": "Ibihingwa (bikurikiranye n'akabando)",
+  "nextIrrigationLabel": "Itariki yo gutera amazi",
+  "nextFertilizingLabel": "Itariki yo gusiga ifumbire",
+  "plannedPlantingLabel": "Itariki yateganyijwe yo gutera"
+  },
+  "dashboard": {
+    "welcome": "Murakaza neza, {name}!"
+  }
+  ,
+  "farmlands": {
+    "title": "Imirima",
+    "subtitle": "Kurikirana imirima, ibihingwa, n'ibihe byo gutera amazi",
+    "searchPlaceholder": "Shakisha izina, ibihingwa, ubuso",
+    "totalFarmlands": "Umubare w'imirima",
+    "cropTypes": "Ubwoko bw'ibihingwa",
+    "scheduledIrrigations": "Gutunganya gutera amazi",
+    "noFarmlands": "Nta mirima iriho.",
+    "noMatch": "Nta murima uhura na cyo.",
+    "loading": "Birimo gupakurura imirima…",
+    "view": "Reba",
+    "delete": "Siba"
+  },
+  "crops": {
+    "title": "Ubumenyi ku bihingwa",
+    "subtitle": "Indwara, ibihe byiza, n'ibitekerezo ku isoko",
+    "searchPlaceholder": "Shakisha ibihingwa, indwara, inama...",
+    "loading": "Birimo gupakurura ibihingwa…",
+    "noMatches": "Nta bihura.",
+    "addCrop": "Ongeraho igihingwa",
+    "save": "Birimo kubika…",
+    "get": "Fata",
+    "selectCrop": "Hitamo igihingwa",
+    "analyzing": "Birimo gusesengura...",
+    "analyzeOnDashboard": "Sobanura kuri Dashboard"
+  },
+  "common": {
+    "noData": "Nta makuru",
+    "loading": "Birimo…",
+    "trackCrops": "Kurikirana ibihingwa",
+    "scheduleEvent": "Tegura igikorwa",
+    "logExpense": "Andika ikiguzi",
+    "scanCrop": "Skena indwara y'igihingwa",
+    "addNewEmployee": "Ongeraho umukozi mushya"
+  }
+  ,
+  "scheduler": {
+    "title": "Tegura igikorwa",
+    "titleLabel": "Ingingo",
+    "titlePlaceholder": "Hindura umushahara, Tegereza umurima wa Ruguru...",
+    "typeLabel": "Ubwoko",
+    "dateLabel": "Itariki",
+    "types": {
+      "general": "Rusange",
+      "irrigation": "Guterwa amazi",
+      "fertilizing": "Gutanga ifumbire",
+      "planting": "Guterwa",
+      "payment": "Kwishyura abakozi"
+    },
+    "target": {
+      "none": "Nta wanditse",
+      "farmland": "Umurima",
+      "employee": "Umukozi"
+    },
+    "farmlandLabel": "Umurima",
+    "employeeLabel": "Umukozi"
+  },
+  "settings": {
+    "title": "Imyirondoro y' konti",
+    "profileTitle": "Amakuru y'umwirondoro",
+    "changePasswordTitle": "Hindura ijambo ry'ibanga"
+  },
+  "buttons": {
+    "save": "Bika",
+    "saving": "Birimo kubika...",
+    "upload": "Ohereza",
+    "useCamera": "Koresha Camera",
+    "remove": "Kuraho",
+    "openInAiTools": "Fungura muri AI Tools",
+    "updatePassword": "Hindura ijambo ry'ibanga"
+  }
+  ,
+  "transactions": {
+    "addTitle": "Ongeramo imirimo y'imari",
+    "typeLabel": "Ubwoko",
+    "typeExpense": "Igishoro",
+    "typeIncome": "Inyungu",
+    "assignTo": "Shyira kuri",
+    "assign": {
+      "none": "Nta",
+      "farmland": "Umurima",
+      "employee": "Umukozi"
+    }
+  },
+  "employees": {
+    "loading": "Birimo gupakurura abakozi…",
+    "noEmployees": "Nta bakozi babonetse."
+  }
+}

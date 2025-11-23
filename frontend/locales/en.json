@@ -1,0 +1,125 @@
+{
+  "nav": {
+    "upcomingTasks": "Upcoming Tasks",
+    "add": "Add",
+    "cancel": "Cancel",
+    "addFarmland": "Add Farmland",
+    "language": "Language"
+  },
+  "tasks": {
+    "loading": "Loading tasks…",
+    "noTasks": "No tasks yet.",
+    "markDone": "Mark done",
+    "undo": "Undo",
+    "delete": "Delete",
+    "taskCreated": "Task created"
+  },
+  "farmland": {
+    "namePlaceholder": "North Plot",
+    "areaPlaceholder": "2 ha",
+    "cropsPlaceholder": "Maize, Beans",
+    "nextIrrigation": "Next irrigation date",
+    "nextFertilizing": "Next fertilizing date",
+  "plannedPlanting": "Planned planting date",
+  "saving": "Saving…",
+  "addFarmland": "Add Farmland",
+  "nameLabel": "Farmland name",
+  "areaLabel": "Area (e.g., 2.5 ha)",
+  "cropsLabel": "Crops (comma-separated)",
+  "nextIrrigationLabel": "Next irrigation date",
+  "nextFertilizingLabel": "Next fertilizing date",
+  "plannedPlantingLabel": "Planned planting date"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}!"
+  }
+  ,
+  "farmlands": {
+    "title": "Farmlands",
+    "subtitle": "Track plots, planted crops, and irrigation schedules",
+    "searchPlaceholder": "Search by name, crops, area",
+    "totalFarmlands": "Total Farmlands",
+    "cropTypes": "Crop Types",
+    "scheduledIrrigations": "Scheduled Irrigations",
+    "noFarmlands": "No farmlands yet.",
+    "noMatch": "No farmlands match your search.",
+    "loading": "Loading farmlands…",
+    "view": "View",
+    "delete": "Delete"
+  },
+  "crops": {
+    "title": "Crops Intelligence",
+    "subtitle": "Diseases, optimal conditions, and market insights",
+    "searchPlaceholder": "Search crops, diseases, tips...",
+    "loading": "Loading crops…",
+    "noMatches": "No matches.",
+    "addCrop": "Add Crop",
+    "save": "Saving…",
+    "get": "Get",
+    "selectCrop": "Select a crop",
+    "analyzing": "Analyzing...",
+    "analyzeOnDashboard": "Analyze on Dashboard"
+  },
+  "common": {
+    "noData": "No data",
+    "loading": "Loading...",
+    "trackCrops": "Track Crops",
+    "scheduleEvent": "Schedule Event",
+    "logExpense": "Log Expense",
+    "scanCrop": "Scan Crop Disease",
+    "addNewEmployee": "Add New Employee"
+  }
+  ,
+  "scheduler": {
+    "title": "Schedule Event",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Pay wages, Irrigate North Plot...",
+    "typeLabel": "Type",
+    "dateLabel": "Date",
+    "types": {
+      "general": "General",
+      "irrigation": "Irrigation",
+      "fertilizing": "Fertilizing",
+      "planting": "Planting",
+      "payment": "Employee Payment"
+    },
+    "target": {
+      "none": "No specific target",
+      "farmland": "Farmland",
+      "employee": "Employee"
+    },
+    "farmlandLabel": "Farmland",
+    "employeeLabel": "Employee"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "profileTitle": "Profile Information",
+    "changePasswordTitle": "Change Password"
+  },
+  "buttons": {
+    "save": "Save",
+    "saving": "Saving...",
+    "upload": "Upload",
+    "useCamera": "Use Camera",
+    "remove": "Remove",
+    "openInAiTools": "Open in AI Tools",
+    "updatePassword": "Update Password"
+  }
+  ,
+  "transactions": {
+    "addTitle": "Add Transaction",
+    "typeLabel": "Type",
+    "typeExpense": "Expense",
+    "typeIncome": "Income",
+    "assignTo": "Assign to",
+    "assign": {
+      "none": "None",
+      "farmland": "Farmland",
+      "employee": "Employee"
+    }
+  },
+  "employees": {
+    "loading": "Loading employees…",
+    "noEmployees": "No employees available."
+  }
+}

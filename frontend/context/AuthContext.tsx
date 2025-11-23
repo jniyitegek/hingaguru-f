@@ -41,30 +41,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   // Check if user is logged in on initial load
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          // Set auth token in axios headers
-          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          
-          // Fetch user data
-          const response = await apiClient.get('/api/auth/me');
-          setUser(response.data);
-          localStorage.setItem('user', JSON.stringify(response.data));
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        localStorage.removeItem('token');
-        delete apiClient.defaults.headers.common['Authorization'];
-      } finally {
+useEffect(() => {
+    const pathname = window.location.pathname; // or usePathname()
+
+    if (pathname === "/landing") {
         setLoading(false);
-      }
+        return;
+    }
+
+    const checkAuth = async () => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (token) {
+                apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+                const response = await apiClient.get("/api/auth/me");
+                setUser(response.data);
+                localStorage.setItem("user", JSON.stringify(response.data));
+            }
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            localStorage.removeItem("token");
+            delete apiClient.defaults.headers.common["Authorization"];
+        } finally {
+            setLoading(false);
+        }
     };
 
     checkAuth();
-  }, []);
+}, []);
+
 
   // Login user
   const login = async (email: string, password: string) => {

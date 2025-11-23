@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const useOpenAI = model === "openai";
     const openaiKey = process.env.OPENAI_API_KEY;
-    const geminiKey = "AIzaSyBXscMVE5rU_Ny5QcbiW5Ur45fqbm6sJo4";
+    const geminiKey = "AIzaSyDRcJ8BU2gezrH8u3EpLmoymRPnFncs3LI";
 
     if (useOpenAI && openaiKey) {
       const payload: any = {

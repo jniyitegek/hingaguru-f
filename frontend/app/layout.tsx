@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { LocaleProvider } from "@/context/LocaleContext";
 import NextTopLoader from "nextjs-toploader";
 
 const geistSans = Geist({
@@ -29,10 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
-        <AuthProvider>
-          <NextTopLoader />
-          {children}
-        </AuthProvider>
+        <LocaleProvider>
+          <AuthProvider>
+            <NextTopLoader />
+            {children}
+          </AuthProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
